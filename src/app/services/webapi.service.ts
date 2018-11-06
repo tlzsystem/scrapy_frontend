@@ -28,11 +28,11 @@ export class WebapiService {
   }
 
   getStatus(jobId: string):Observable<any> {
-    // AQUI DEBIESE IR A LA PETICIÓN DEL TRABAJO TERMINADO
+    // AQUI DEBIESE IR A LA PETICIÓN para saber si EL TRABAJO TERMINADO
     // var headerOptions = new HttpHeaders().set( 'Content-Type', 'application/x-www-form-urlencoded' );
     // let a = this.http.get('https://app.scrapinghub.com/api/jobs/list.json?project=356324&state=running', {headers: headerOptions});
 
-    return this.http.get(this.urlStorage+'items/'+'356324/1/9'+'?format=json&apikey=34954489cef24031afb3ade02be8bd4d');
+    return this.http.get(this.urlStorage+'items/'+'356324/1/9'+'?format=json&apikey=34954489cef24031afb3ade02be8bd4d'); //use esta url de prueba solamente
          
 
 
