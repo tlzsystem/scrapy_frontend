@@ -16,7 +16,8 @@ import { WebapiService } from './services/webapi.service';
 import { ExcelService } from './services/excel.service';
 
 import { HttpClientModule } from '@angular/common/http'; 
-
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor  } from './services/request-interceptor';
 @NgModule({
   declarations: [
     AppComponent
@@ -34,7 +35,15 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule,
     MatProgressSpinnerModule,
   ],
-  providers: [WebapiService, ExcelService],
+  providers: [
+    WebapiService, 
+    ExcelService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

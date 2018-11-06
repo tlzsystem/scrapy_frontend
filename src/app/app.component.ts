@@ -84,9 +84,9 @@ export class AppComponent {
     console.log(' ' + this.tipoViviendaSelected.value.viewValue +  ' ' + this.comunaSelected.value);
     let url:string = this.buildUrl();
     console.log('url: ' + url);
-    this.webApiService.getData(url);
+    //this.webApiService.getData(url);
 
-    this.webApiService.getData(url).subscribe(response => {
+    this.webApiService.getDataJSON("356324/1/9").subscribe(response => {
       this.dataJson = response;
       this.isLoadingResults = false;
       this.exportAsXLSX();
@@ -100,6 +100,6 @@ export class AppComponent {
   }
 
   exportAsXLSX():void {
-    this.excelService.exportAsExcelFile(this.data, 'sample');
+    this.excelService.exportAsExcelFile(this.dataJson, 'sample');
   }
 }
