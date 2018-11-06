@@ -10,7 +10,7 @@ export interface Comunas {
   viewValue: string;
 }
 
-export interface Tipos {  
+export interface Tipos {
   viewValue: string;
 }
 
@@ -24,30 +24,32 @@ export class AppComponent {
   title = 'Datos Portal Inmobiliario';
 
   public isLoadingResults = false;
+  public statusRequest = '';
+
   comunaSelected = new FormControl();
   tipoViviendaSelected = new FormControl();
-    
+
   comunasInterface: Comunas[] = [
-    {apiValue: 'puente-alto-metropolitana', viewValue: 'Puente Alto'},
-    {apiValue: 'la-florida-metropolitana', viewValue: 'La Florida'},
-    {apiValue: 'quilicura-metropolitana', viewValue: 'Quilicura'}
+    { apiValue: 'puente-alto-metropolitana', viewValue: 'Puente Alto' },
+    { apiValue: 'la-florida-metropolitana', viewValue: 'La Florida' },
+    { apiValue: 'quilicura-metropolitana', viewValue: 'Quilicura' }
   ];
 
   comunas: string[] = ['puente-alto-metropolitana', 'la-florida-metropolitana', 'quilicura-metropolitana'];
-  
+
   tipos: Tipos[] = [
     { viewValue: 'Casa' },
     { viewValue: 'Departamento' }
   ];
-  
+
   filteredOptions: Observable<string[]>;
 
-  dataJson:any;
+  dataJson: any;
 
   constructor(
     private webApiService: WebapiService,
     private excelService: ExcelService
-  ){ }
+  ) { }
 
   ngOnInit() {
     this.filteredOptions = this.comunaSelected.valueChanges
@@ -64,45 +66,82 @@ export class AppComponent {
   }
 
 
-  generaJob(tipo: string, valor: string){
+  generaJob(tipo: string, valor: string) {
     this.isLoadingResults = true;
+    let entrarAqui = true;
     console.log('Iniciando el job ....');
-    let url: string = this.buildUrl(tipo,valor);
+    let url: string = this.buildUrl(tipo, valor);
     console.log('url: ' + url);
-    this.webApiService.initJob(url).subscribe(response => {
-      var a =  JSON.stringify(response);
-        if (a.status = 'ok'){
 
-            console.log("ESTAMOS LISTO ");
+    this.webApiService.initJob(url).subscribe(
+      jobResult => {
+
+        if (jobResult['status'] = 'ok') {
+
+          while (this.statusRequest != 'finished') { //añadir una segunda condición de corte por ejemplo tiempo que lleve sin obtener datos
+
+            if (entrarAqui) { // entra aqui es nua varible que se usa para no realizar la petición hasta la anterior haya terminado
+
+              entrarAqui = false;
+
+              this.webApiService.getStatus(jobResult['jobid']).subscribe(
+                status => {
+                  this.statusRequest = status['outcome']; //OUTCOME QUIZAS NO SEA EL CAMPO AQUI -  AGREGAR CUANTOS ITEMS LLEVA RECOLECTADO PARA MOSTRAR EN PANTALLA MIENTRAS CARGA
+                  entrarAqui = true;
+                },
+
+                error => {
+                  this.statusRequest = '';
+                  alert('Error en la petición de estado de los datos \n\nMotivo: ' + error.statusText + ': ' + error.status)
+                }
+
+              );
+            }
+
+          }
+
+          if (this.statusRequest == 'finished' && this.dataJson.length > 0) {
+            this.exportDataExcel(jobResult['jobid']);
+            this.isLoadingResults = false;
+
+          } else {
+            this.isLoadingResults = false;
+            alert('No se encontraron Datos');
+          }
+
 
         } else {
           this.isLoadingResults = false;
+          alert('La petición de Datos Falló');
         }
-    });
+      },
+
+      error => {
+        this.isLoadingResults = false;
+        alert('No se pudo conectar al Portal Inmobiliario - No se inició el Trabajo. \n\nMotivo: ' + error.statusText + ': ' + error.status)
+
+      }
+
+    );
 
 
   }
 
-  exportDataExcel(){
+  exportDataExcel(idJob: string) {
     this.isLoadingResults = true;
-    console.log(' ' + this.tipoViviendaSelected.value.viewValue +  ' ' + this.comunaSelected.value);
-    
-    //this.webApiService.getData(url);
 
-    this.webApiService.getDataJSON("356324/1/9").subscribe(response => {
+    this.webApiService.getDataJSON(idJob).subscribe(response => { //"356324/1/9"  "356324/1/25"
       this.dataJson = response;
+      this.excelService.exportAsExcelFile(this.dataJson, 'datosPortal');
       this.isLoadingResults = false;
-      this.exportAsXLSX();
     });
 
-    
+
   }
 
-  buildUrl(tipoPropiedad: string, valor: string):string{
-    return 'https://www.portalinmobiliario.com/venta/'+tipoPropiedad +'/'+valor+'?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
+  buildUrl(tipoPropiedad: string, valor: string): string {
+    return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
   }
 
-  exportAsXLSX():void {
-    this.excelService.exportAsExcelFile(this.dataJson, 'sample');
-  }
+
 }

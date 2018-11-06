@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class WebapiService {
-
+  
   urlApi: string = 'https://app.scrapinghub.com/api/';
   urlStorage: string = 'https://storage.scrapinghub.com/';
 
@@ -17,9 +17,7 @@ export class WebapiService {
   }
 
   getDataJSON(idItem: string):Observable<any>{
-    
-
-      return this.http.get(this.urlStorage+'items/'+idItem+'?format=json&apikey=34954489cef24031afb3ade02be8bd4d')
+      return this.http.get(this.urlStorage+'items/'+idItem+'?format=json&apikey=34954489cef24031afb3ade02be8bd4d');
   }
 
   initJob(inicial: string){
@@ -27,6 +25,14 @@ export class WebapiService {
 
     var headerOptions = new HttpHeaders().set( 'Content-Type', 'application/x-www-form-urlencoded' );
     return this.http.post(this.urlApi + 'run.json?apikey=34954489cef24031afb3ade02be8bd4d', body, {headers: headerOptions});
+  }
+
+  getStatus(jobId: string):Observable<any> {
+    // AQUI DEBIESE IR A LA PETICIÓN DEL TRABAJO TERMINADO
+    // var headerOptions = new HttpHeaders().set( 'Content-Type', 'application/x-www-form-urlencoded' );
+    // let a = this.http.get('https://app.scrapinghub.com/api/jobs/list.json?project=356324&state=running', {headers: headerOptions});
+
+    return null;
   }
 
 }
