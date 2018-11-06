@@ -78,36 +78,30 @@ export class AppComponent {
 
         if (jobResult['status'] = 'ok') {
 
-          while (this.statusRequest != 'finished') { //añadir una segunda condición de corte por ejemplo tiempo que lleve sin obtener datos
+          setInterval(() => {
+            this.webApiService.getStatus(jobResult['jobid']).subscribe(
+              status => {
+                this.statusRequest = status['outcome'];
+                entrarAqui = true;
 
-            if (entrarAqui) { // entra aqui es nua varible que se usa para no realizar la petición hasta la anterior haya terminado
-
-              entrarAqui = false;
-
-              this.webApiService.getStatus(jobResult['jobid']).subscribe(
-                status => {
-                  this.statusRequest = status['outcome']; //OUTCOME QUIZAS NO SEA EL CAMPO AQUI -  AGREGAR CUANTOS ITEMS LLEVA RECOLECTADO PARA MOSTRAR EN PANTALLA MIENTRAS CARGA
-                  entrarAqui = true;
-                },
-
-                error => {
-                  this.statusRequest = '';
-                  alert('Error en la petición de estado de los datos \n\nMotivo: ' + error.statusText + ': ' + error.status)
+                if (this.statusRequest == 'finished' && this.dataJson.length > 0) {
+                  this.exportDataExcel(jobResult['jobid']);
+                  this.isLoadingResults = false;
+      
+                } else {
+                  this.isLoadingResults = false;
+                  alert('No se encontraron Datos');
                 }
 
-              );
-            }
+              },
 
-          }
+              error => {
+                this.statusRequest = '';
+                alert('Error en la petición de estado de los datos \n\nMotivo: ' + error.statusText + ': ' + error.status)
+              }
 
-          if (this.statusRequest == 'finished' && this.dataJson.length > 0) {
-            this.exportDataExcel(jobResult['jobid']);
-            this.isLoadingResults = false;
-
-          } else {
-            this.isLoadingResults = false;
-            alert('No se encontraron Datos');
-          }
+            );
+          }, 3000);          
 
 
         } else {
