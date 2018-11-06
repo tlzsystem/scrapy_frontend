@@ -42,22 +42,6 @@ export class AppComponent {
   
   filteredOptions: Observable<string[]>;
 
-  data: any = [{
-    eid: 'e101',
-    ename: 'ravi',
-    esal: 1000
-  },
-  {
-    eid: 'e102',
-    ename: 'ram',
-    esal: 2000
-  },
-  {
-    eid: 'e103',
-    ename: 'rajesh',
-    esal: 3000
-  }];
-
   dataJson:any;
 
   constructor(
@@ -79,11 +63,30 @@ export class AppComponent {
     return this.comunas.filter(option => option.toLowerCase().includes(filterValue));
   }
 
+
+  generaJob(tipo: string, valor: string){
+    this.isLoadingResults = true;
+    console.log('Iniciando el job ....');
+    let url: string = this.buildUrl(tipo,valor);
+    console.log('url: ' + url);
+    this.webApiService.initJob(url).subscribe(response => {
+      var a =  JSON.stringify(response);
+        if (a.status = 'ok'){
+
+            console.log("ESTAMOS LISTO ");
+
+        } else {
+          this.isLoadingResults = false;
+        }
+    });
+
+
+  }
+
   exportDataExcel(){
     this.isLoadingResults = true;
     console.log(' ' + this.tipoViviendaSelected.value.viewValue +  ' ' + this.comunaSelected.value);
-    let url:string = this.buildUrl();
-    console.log('url: ' + url);
+    
     //this.webApiService.getData(url);
 
     this.webApiService.getDataJSON("356324/1/9").subscribe(response => {
@@ -95,8 +98,8 @@ export class AppComponent {
     
   }
 
-  buildUrl():string{
-    return 'https://www.portalinmobiliario.com/venta/casa/puente-alto-metropolitana?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
+  buildUrl(tipoPropiedad: string, valor: string):string{
+    return 'https://www.portalinmobiliario.com/venta/'+tipoPropiedad +'/'+valor+'?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
   }
 
   exportAsXLSX():void {
