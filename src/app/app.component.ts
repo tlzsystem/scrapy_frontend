@@ -76,50 +76,47 @@ export class AppComponent {
     this.webApiService.initJob(url).subscribe(
       jobResult => {
 
-        if (jobResult['status'] = 'ok') {
+        console.log(jobResult);
 
-          setInterval(() => {
-            this.webApiService.getStatus(jobResult['jobid']).subscribe(
-              status => {
-                this.statusRequest = status['outcome'];
-                entrarAqui = true;
-
-                if (this.statusRequest == 'finished' && this.dataJson.length > 0) {
-                  this.exportDataExcel(jobResult['jobid']);
-                  this.isLoadingResults = false;
-      
-                } else {
-                  this.isLoadingResults = false;
-                  alert('No se encontraron Datos');
-                }
-
-              },
-
-              error => {
-                this.statusRequest = '';
-                alert('Error en la petición de estado de los datos \n\nMotivo: ' + error.statusText + ': ' + error.status)
-              }
-
-            );
-          }, 3000);          
-
-
+        if (jobResult['status'] = 'ok') { 
+            this.checkJobResult(jobResult);
         } else {
-          this.isLoadingResults = false;
-          alert('La petición de Datos Falló');
+          setTimeout(function(){
+          this.generaJob(tipo, valor);
+          }, 1000);
         }
       },
 
       error => {
-        this.isLoadingResults = false;
-        alert('No se pudo conectar al Portal Inmobiliario - No se inició el Trabajo. \n\nMotivo: ' + error.statusText + ': ' + error.status)
-
+        this.generaJob(tipo, valor);
       }
-
     );
-
-
   }
+
+  checkJobResult(jobResult:Object){
+    
+      var thisApp = this;
+
+      this.webApiService.getStatus(jobResult['jobid']).subscribe(
+        status => {
+          this.statusRequest = status['jobs'][0]['state'];
+          if (this.statusRequest == 'finished') {
+            this.exportDataExcel(jobResult['jobid']);
+          } else {
+            setTimeout(function(){
+              thisApp.checkJobResult(jobResult);
+            },1000);
+          }
+        },
+        error => {
+          this.statusRequest = '';
+          this.isLoadingResults = false;
+          alert('Error en la petición de estado de los datos \n\nMotivo: ' + error.statusText + ': ' + error.status)
+        }
+      );  
+    }
+
+
 
   exportDataExcel(idJob: string) {
     this.isLoadingResults = true;
