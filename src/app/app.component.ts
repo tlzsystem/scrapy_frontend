@@ -65,32 +65,45 @@ export class AppComponent {
     return this.comunas.filter(option => option.toLowerCase().includes(filterValue));
   }
 
+  detieneJobs(){
+    this.webApiService.stopJobs();
+  }
+
 
   generaJob(tipo: string, valor: string) {
+
     this.isLoadingResults = true;
     let entrarAqui = true;
-    console.log('Iniciando el job ....');
     let url: string = this.buildUrl(tipo, valor);
-    console.log('url: ' + url);
+    var thisApp = this;
 
-    this.webApiService.initJob(url).subscribe(
-      jobResult => {
+    if(this.webApiService.jobsStoped){
+      this.webApiService.initJob(url).subscribe(
+        jobResult => {
 
-        console.log(jobResult);
+          console.log(jobResult);
 
-        if (jobResult['status'] = 'ok') { 
-            this.checkJobResult(jobResult);
-        } else {
+          if (jobResult['status'] = 'ok') { 
+            thisApp.checkJobResult(jobResult);
+          } else {
+            setTimeout(function(){
+              thisApp.generaJob(tipo, valor);
+            }, 5000);
+          }
+        },
+
+        error => {
           setTimeout(function(){
-          this.generaJob(tipo, valor);
-          }, 1000);
+            thisApp.generaJob(tipo, valor);
+          }, 5000);
         }
-      },
-
-      error => {
-        this.generaJob(tipo, valor);
-      }
-    );
+      );
+    }
+    else{
+      setTimeout(function(){
+        thisApp.generaJob(tipo, valor);
+      }, 5000);
+    }
   }
 
   checkJobResult(jobResult:Object){
@@ -105,7 +118,7 @@ export class AppComponent {
           } else {
             setTimeout(function(){
               thisApp.checkJobResult(jobResult);
-            },1000);
+            },5000);
           }
         },
         error => {
