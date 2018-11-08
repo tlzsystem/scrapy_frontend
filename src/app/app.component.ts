@@ -277,7 +277,7 @@ export class AppComponent {
 
     this.isLoadingResults = true;    
     let url: string = this.buildUrl(tipo, valor);
-    var thisApp = this;
+    var thisApp = this; 
 
     let formatedFechaInicio = this.formatFecha(this.fechaInicio); // si es nula mandar una fecha mes anterior al día de hoy - un mes
     let formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
@@ -347,7 +347,7 @@ export class AppComponent {
   exportDataExcel(idJob: string) {
     this.isLoadingResults = true;
 
-    this.webApiService.getDataJSON(idJob).subscribe(response => { //"356324/1/9"  "356324/1/25"
+    this.webApiService.getDataJSON(idJob).subscribe(response => {
       this.dataJson = response;
       if (this.dataJson.length > 0) {
         this.excelService.exportAsExcelFile(this.dataJson, 'datosPortal');
