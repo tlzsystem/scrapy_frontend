@@ -40,6 +40,8 @@
             <mat-datepicker #initPicker></mat-datepicker>
         </mat-form-field>
 
+        <br>
+
         <mat-form-field>
             <input matInput [matDatepicker]="endPicker" placeholder="Fecha Fin" [formControl]="fechaFinSelected" [(ngModel)]="fechaFin" readonly="true">
             <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>

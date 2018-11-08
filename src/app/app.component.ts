@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, pipe } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { WebapiService } from './services/webapi.service';
 import { ExcelService } from './services/excel.service';
+
+import { NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS } from "@angular/material";
+import { AppDateAdapter, APP_DATE_FORMATS } from './adapters/data-adapter';
+
+
 
 export interface Comunas {
   apiValue: string;
@@ -18,7 +23,16 @@ export interface Tipos {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [WebapiService, ExcelService]
+  providers: [
+    WebapiService, 
+    ExcelService,
+    {
+      provide: DateAdapter, useClass: AppDateAdapter
+  },
+  {
+      provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS
+  }
+  ]
 })
 export class AppComponent {
   title = 'Datos Portal Inmobiliario';
@@ -29,6 +43,8 @@ export class AppComponent {
   
   public fechaInicio: Date;
   public fechaFin: Date;
+  public formatedFechaInicio: string;
+  public formatedFechaFin: string;
 
   comunaSelected = new FormControl();
   tipoViviendaSelected = new FormControl();
@@ -275,12 +291,14 @@ export class AppComponent {
 
   generaJob(tipo: string, valor: string) {
 
+    this.formatedFechaInicio = this.formatFecha(this.fechaInicio); // si es nula mandar una fecha mes anterior al día de hoy - un mes
+    this.formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
+
     this.isLoadingResults = true;    
-    let url: string = this.buildUrl(tipo, valor);
+    let url: string = this.buildUrl(tipo, valor, this.formatedFechaInicio, this.formatedFechaFin);
     var thisApp = this; 
 
-    let formatedFechaInicio = this.formatFecha(this.fechaInicio); // si es nula mandar una fecha mes anterior al día de hoy - un mes
-    let formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
+    
 
     if (this.webApiService.jobsStoped) {
       this.webApiService.initJob(url).subscribe(
@@ -360,13 +378,16 @@ export class AppComponent {
 
   }
 
-  buildUrl(tipoPropiedad: string, valor: string): string {
-    return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
+  buildUrl(tipoPropiedad: string, valor: string, fechaInicio: string, fechaFin: string): string {
+    return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0&fi=' + fechaInicio + '&ff=' + fechaFin;
   }
 
-  formatFecha(fecha: Date): string{
-    
-    return '';
+  formatFecha(fecha: Date): string{       
+    return this.to2digit(fecha.getDay()) + '-' + this.to2digit((fecha.getMonth() + 1 )) + '-' + fecha.getFullYear();
+  }
+
+  private to2digit(n: number) {
+    return ('00' + n).slice(-2);
   }
 
 

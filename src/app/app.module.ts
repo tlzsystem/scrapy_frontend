@@ -19,7 +19,7 @@ import { ExcelService } from './services/excel.service';
 import { HttpClientModule } from '@angular/common/http'; 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor  } from './services/request-interceptor';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -47,7 +47,8 @@ import { MatNativeDateModule } from '@angular/material/core';
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
       multi: true
-    }
+    },
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' }
   ],
   bootstrap: [AppComponent]
 })
