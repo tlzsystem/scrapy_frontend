@@ -291,14 +291,17 @@ export class AppComponent {
 
   generaJob(tipo: string, valor: string) {
 
+    if(this.fechaInicio > this.fechaFin){
+      alert('La fecha de inicio es mayor a la fecha de Fin');
+      return;
+    }
+
     this.formatedFechaInicio = this.formatFecha(this.fechaInicio); // si es nula mandar una fecha mes anterior al día de hoy - un mes
     this.formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
 
     this.isLoadingResults = true;    
     let url: string = this.buildUrl(tipo, valor, this.formatedFechaInicio, this.formatedFechaFin);
-    var thisApp = this; 
-
-    
+    var thisApp = this;     
 
     if (this.webApiService.jobsStoped) {
       this.webApiService.initJob(url).subscribe(
