@@ -317,7 +317,8 @@ export class AppComponent {
           {
             this.exportDataExcel(jobResult['jobid']);
           }
-          else{            
+          else{  
+            this.isLoadingResults = false;
             alert('Error en la petición de estado de los datos. El trabajo fue detenido o tuvo un error inesperado');
           }
         } else {
