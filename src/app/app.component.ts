@@ -318,9 +318,16 @@ export class AppComponent {
     this.webApiService.getStatus(jobResult['jobid']).subscribe(
       status => {
         this.itemsScraped = status['jobs'][0]['items_scraped'];
-        this.statusRequest = status['jobs'][0][''];
+        this.statusRequest = status['jobs'][0]['state'];
         if (this.statusRequest == 'finished') {
-          this.exportDataExcel(jobResult['jobid']);
+          if(status['jobs'][0]['close_reason'] === "finished")
+          {
+            this.exportDataExcel(jobResult['jobid']);
+          }
+          else{  
+            this.isLoadingResults = false;
+            alert('Error en la petición de estado de los datos. El trabajo fue detenido o tuvo un error inesperado');
+          }
         } else {
           setTimeout(function () {
             thisApp.checkJobResult(jobResult);
