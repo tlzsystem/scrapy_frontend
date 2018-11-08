@@ -26,9 +26,14 @@ export class AppComponent {
   public isLoadingResults = false;
   public statusRequest = '';
   public itemsScraped = '0';
+  
+  public fechaInicio: Date;
+  public fechaFin: Date;
 
   comunaSelected = new FormControl();
   tipoViviendaSelected = new FormControl();
+  fechaInicioSelected = new FormControl();
+  fechaFinSelected = new FormControl();
 
   comunasInterface: Comunas[] = [
     { apiValue: 'Algarrobo', viewValue: 'algarrobo-quinta' },
@@ -270,10 +275,12 @@ export class AppComponent {
 
   generaJob(tipo: string, valor: string) {
 
-    this.isLoadingResults = true;
-    let entrarAqui = true;
+    this.isLoadingResults = true;    
     let url: string = this.buildUrl(tipo, valor);
     var thisApp = this;
+
+    let formatedFechaInicio = this.formatFecha(this.fechaInicio); // si es nula mandar una fecha mes anterior al día de hoy - un mes
+    let formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
 
     if (this.webApiService.jobsStoped) {
       this.webApiService.initJob(url).subscribe(
@@ -348,6 +355,11 @@ export class AppComponent {
 
   buildUrl(tipoPropiedad: string, valor: string): string {
     return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
+  }
+
+  formatFecha(fecha: Date): string{
+    
+    return '';
   }
 
 

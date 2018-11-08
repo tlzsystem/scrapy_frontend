@@ -11,6 +11,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 import { WebapiService } from './services/webapi.service';
 import { ExcelService } from './services/excel.service';
@@ -18,6 +19,8 @@ import { ExcelService } from './services/excel.service';
 import { HttpClientModule } from '@angular/common/http'; 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor  } from './services/request-interceptor';
+import { MatNativeDateModule } from '@angular/material/core';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -34,6 +37,8 @@ import { RequestInterceptor  } from './services/request-interceptor';
     MatSelectModule,
     HttpClientModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   providers: [
     WebapiService, 
