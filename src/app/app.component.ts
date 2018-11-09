@@ -41,8 +41,8 @@ export class AppComponent {
   public statusRequest = '';
   public itemsScraped = '0';
   
-  public fechaInicio: Date;
-  public fechaFin: Date;
+  public fechaInicio: Date = new Date();
+  public fechaFin: Date = new Date();
   public formatedFechaInicio: string;
   public formatedFechaFin: string;
 
@@ -271,6 +271,9 @@ export class AppComponent {
   ) { }
 
   ngOnInit() {
+    
+    this.fechaInicio.setDate(this.fechaInicio.getDate() - 7);
+
     this.filteredOptions = this.comunaSelected.valueChanges
       .pipe(
         startWith(''),

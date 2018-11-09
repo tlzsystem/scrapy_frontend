@@ -28,11 +28,7 @@ export class WebapiService {
     return this.http.post(this.urlApi + 'run.json?apikey=34954489cef24031afb3ade02be8bd4d', body, {headers: headerOptions});
   }
 
-  getStatus(jobId: string):Observable<any> {
-    // AQUI DEBIESE IR A LA PETICIÓN para saber si EL TRABAJO TERMINADO
-    // var headerOptions = new HttpHeaders().set( 'Content-Type', 'application/x-www-form-urlencoded' );
-    // let a = this.http.get('https://app.scrapinghub.com/api/jobs/list.json?project=356324&state=running', {headers: headerOptions});
-
+  getStatus(jobId: string):Observable<any> {    
     return this.http.get('https://app.scrapinghub.com/api/jobs/list.json?job='+jobId+'&project=356324&apikey=34954489cef24031afb3ade02be8bd4d');
   }
 
