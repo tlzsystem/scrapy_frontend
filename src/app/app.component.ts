@@ -261,7 +261,7 @@ export class AppComponent {
     { viewValue: 'Departamento' }
   ];
 
-  filteredOptions: Observable<string[]>;
+  filteredOptions: Observable<Comunas[]>;
 
   dataJson: any;
 
@@ -273,6 +273,7 @@ export class AppComponent {
   ngOnInit() {
     
     this.fechaInicio.setDate(this.fechaInicio.getDate() - 7);
+    this.fechaFin.setDate(this.fechaFin.getDate() + 1);
 
     this.filteredOptions = this.comunaSelected.valueChanges
       .pipe(
@@ -281,10 +282,10 @@ export class AppComponent {
       );
   }
 
-  private _filter(value: string): string[] {
+  private _filter(value: string): Comunas[] {
     const filterValue = value.toLowerCase();
 
-    return this.comunas.filter(option => option.toLowerCase().includes(filterValue));
+    return this.comunasInterface.filter(comuna => comuna.apiValue.toLowerCase().includes(filterValue));
   }
 
   detieneJobs() {

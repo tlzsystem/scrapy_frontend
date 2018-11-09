@@ -28,8 +28,8 @@
         <mat-form-field class="example-full-width">
             <input type="text" placeholder="Escribe una comuna" aria-label="Number" matInput [formControl]="comunaSelected" [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                    {{option}}
+                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.viewValue">
+                    {{option.apiValue}}
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>
