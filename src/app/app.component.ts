@@ -304,60 +304,47 @@ export class AppComponent {
     this.formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
 
     this.isLoadingResults = true;    
-    let url: string = this.buildUrl(tipo, valor, this.formatedFechaInicio, this.formatedFechaFin);
-    var thisApp = this;     
+    let url: string = this.buildUrl(tipo, valor);   
 
-    if (this.webApiService.jobsStoped) {
-      this.webApiService.initJob(url).subscribe(
+      this.webApiService.initJob(url, this.formatedFechaInicio, this.formatedFechaFin).subscribe(
         jobResult => {
-
-          console.log(jobResult);
-
+          console.log('INICIAMOS EL JOB: ' + jobResult);
           if (jobResult['status'] = 'ok') {
-            thisApp.checkJobResult(jobResult);
+            this.checkJobResult(jobResult);
           } else {
             setTimeout(function () {
-              thisApp.generaJob(tipo, valor);
+              this.generaJob(tipo, valor);
             }, 5000);
           }
-        },
-
-        error => {
-          setTimeout(function () {
-            thisApp.generaJob(tipo, valor);
-          }, 5000);
         }
+
       );
-    }
-    else {
-      setTimeout(function () {
-        thisApp.generaJob(tipo, valor);
-      }, 5000);
-    }
   }
 
   checkJobResult(jobResult: Object) {
 
     var thisApp = this;
-
-    this.webApiService.getStatus(jobResult['jobid']).subscribe(
+    console.log('VAMOS A VERIFICAR EL ESTADO DEL JOB');
+    this.webApiService.getStatus().subscribe(
       status => {
-        this.itemsScraped = status['jobs'][0]['items_scraped'];
-        this.statusRequest = status['jobs'][0]['state'];
-        if (this.statusRequest == 'finished') {
-          if(status['jobs'][0]['close_reason'] === "finished")
-          {
+        console.log('sacamos el estado de todo: Es ESTE =>');
+        console.log(status);
+        let termino:  boolean;
+        termino = false;
+        status['finished'].forEach(element => {
+          if (element['id'] === jobResult['jobid'] ){
+            termino = true;
+            console.log('YA TERMINO');
             this.exportDataExcel(jobResult['jobid']);
           }
-          else{  
-            this.isLoadingResults = false;
-            alert('Error en la petición de estado de los datos. El trabajo fue detenido o tuvo un error inesperado');
-          }
-        } else {
-          setTimeout(function () {
-            thisApp.checkJobResult(jobResult);
-          }, 5000);
-        }
+        }); 
+
+      if (!termino) {
+        console.log('NO TERMINO');
+        setTimeout(function () {
+          thisApp.checkJobResult(jobResult);
+        }, 5000);
+      }
       },
       error => {
         this.statusRequest = '';
@@ -370,9 +357,10 @@ export class AppComponent {
 
 
   exportDataExcel(idJob: string) {
-    this.isLoadingResults = true;
-
+    this.isLoadingResults = false;
+    console.log("VAMOS A EXPORTAR");
     this.webApiService.getDataJSON(idJob).subscribe(response => {
+      console.log("LLEGARON ESTOS DATOS: "+response);
       this.dataJson = response;
       if (this.dataJson.length > 0) {
         this.excelService.exportAsExcelFile(this.dataJson, 'datosPortal');
@@ -385,8 +373,8 @@ export class AppComponent {
 
   }
 
-  buildUrl(tipoPropiedad: string, valor: string, fechaInicio: string, fechaFin: string): string {
-    return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0&fi=' + fechaInicio + '&ff=' + fechaFin;
+  buildUrl(tipoPropiedad: string, valor: string): string {
+    return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
   }
 
   formatFecha(fecha: Date): string{       

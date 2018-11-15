@@ -10,6 +10,7 @@ export class WebapiService {
   urlApi: string = 'https://app.scrapinghub.com/api/';
   urlStorage: string = 'https://storage.scrapinghub.com/';
   jobsStoped: boolean = false;
+  urlFINAL : string = 'http://ec2-3-16-165-18.us-east-2.compute.amazonaws.com:6800/';
 
   constructor(private http: HttpClient) { }
 
@@ -18,42 +19,36 @@ export class WebapiService {
   }
 
   getDataJSON(idItem: string):Observable<any>{
-      return this.http.get(this.urlStorage+'items/'+idItem+'?format=json&apikey=34954489cef24031afb3ade02be8bd4d');
+      return this.http.get('http://ec2-3-16-165-18.us-east-2.compute.amazonaws.com/' + idItem + '.jl');
   }
 
-  initJob(inicial: string){
-    let body = `project=${'356324'}&spider=${'listado'}&inicial=${inicial}`;
+  initJob(inicial: string, fi:string, ff:string){
+    let body = `project=${'portalinmobiliario'}&spider=${'listado'}&inicial=${inicial}&fi=${fi}&ff=${ff}`;
 
     var headerOptions = new HttpHeaders().set( 'Content-Type', 'application/x-www-form-urlencoded' );
-    return this.http.post(this.urlApi + 'run.json?apikey=34954489cef24031afb3ade02be8bd4d', body, {headers: headerOptions});
+    return this.http.post(this.urlFINAL + 'schedule.json', body, {headers: headerOptions});
   }
 
-  getStatus(jobId: string):Observable<any> {    
-    return this.http.get('https://app.scrapinghub.com/api/jobs/list.json?job='+jobId+'&project=356324&apikey=34954489cef24031afb3ade02be8bd4d');
+  getStatus():Observable<any> {    
+    return this.http.get(this.urlFINAL+'listjobs.json?project=portalinmobiliario');
   }
 
   stopJobs(){
-    let result = this.http.get('https://app.scrapinghub.com/api/jobs/list.json?state=running&project=356324&apikey=34954489cef24031afb3ade02be8bd4d');
 
     var webApi = this;
     
-    result.subscribe(jobsData => {
+    this.http.get(this.urlFINAL + 'listjobs.json?project=portalinmobiliario').subscribe(jobsData => {
 
       console.log(jobsData);
 
-      if(jobsData["total"] !== 0){
-        jobsData["jobs"].forEach( (job) => {
+      if(jobsData["running"].length !== 0){
+        jobsData["running"].forEach( (job) => {
               
           var data = new FormData();
-          data.append("job", job["id"]);
-          data.append("project", '356324');
-          data.append("apikey", '34954489cef24031afb3ade02be8bd4d');
-
-          this.http.post('https://app.scrapinghub.com/api/jobs/stop.json', data ).subscribe(result => {
+          data.append("project", 'portalinmobiliario');
+          data.append("job", job["id"]);  
+          this.http.post(this.urlFINAL+'cancel.json', data ).subscribe(result => {
             console.log(result);
-            setTimeout(function(){
-              webApi.stopJobs();
-            }, 1500);
           });
         });
       }
