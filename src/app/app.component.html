@@ -18,6 +18,15 @@
     <form class="example-form">
 
         <mat-form-field>
+                <mat-select placeholder="Operacion" [formControl]="tipoOPeracionSelected">
+                    <mat-option *ngFor="let operacion of operaciones" [value]="operacion">
+                        {{ operacion.viewValue }}
+                    </mat-option>
+                </mat-select>
+         </mat-form-field> <br>
+
+
+        <mat-form-field>
             <mat-select placeholder="Tipo Vivienda" [formControl]="tipoViviendaSelected">
                 <mat-option *ngFor="let tipo of tipos" [value]="tipo">
                     {{ tipo.viewValue }}
@@ -54,6 +63,6 @@
 </div>
 
 <div class="action">
-    <button mat-flat-button color="primary" (click)="detieneJobs();generaJob(this.tipoViviendaSelected.value.viewValue,this.comunaSelected.value )">Exportar a Excel</button>
+    <button mat-flat-button color="primary" (click)="detieneJobs();generaJob(this.tipoOPeracionSelected.value.viewValue, this.tipoViviendaSelected.value.viewValue,this.comunaSelected.value )">Exportar a Excel</button>
 
 </div>

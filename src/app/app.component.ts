@@ -18,6 +18,9 @@ export interface Comunas {
 export interface Tipos {
   viewValue: string;
 }
+ export interface Operacion{
+   viewValue: string;
+ }
 
 @Component({
   selector: 'app-root',
@@ -46,6 +49,7 @@ export class AppComponent {
   public formatedFechaInicio: string;
   public formatedFechaFin: string;
 
+  tipoOPeracionSelected = new FormControl();
   comunaSelected = new FormControl();
   tipoViviendaSelected = new FormControl();
   fechaInicioSelected = new FormControl();
@@ -258,7 +262,16 @@ export class AppComponent {
 
   tipos: Tipos[] = [
     { viewValue: 'Casa' },
-    { viewValue: 'Departamento' }
+    { viewValue: 'Departamento' },
+    { viewValue: 'Oficina' },
+    { viewValue: 'Parcela' },
+    { viewValue: 'Sitio' },
+    { viewValue: 'Bodega' },
+  ];
+
+  operaciones: Operacion[] = [
+    { viewValue: 'Venta'},
+    { viewValue: 'Arriendo'},
   ];
 
   filteredOptions: Observable<Comunas[]>;
@@ -293,7 +306,7 @@ export class AppComponent {
   }
 
 
-  generaJob(tipo: string, valor: string) {
+  generaJob(operacion: string, tipo: string, valor: string) {
 
     if(this.fechaInicio > this.fechaFin){
       alert('La fecha de inicio es mayor a la fecha de Fin');
@@ -304,7 +317,7 @@ export class AppComponent {
     this.formatedFechaFin = this.formatFecha(this.fechaFin); //un día más que la de inicio si está nula
 
     this.isLoadingResults = true;    
-    let url: string = this.buildUrl(tipo, valor);   
+    let url: string = this.buildUrl(operacion, tipo, valor);   
 
       this.webApiService.initJob(url, this.formatedFechaInicio, this.formatedFechaFin).subscribe(
         jobResult => {
@@ -373,8 +386,8 @@ export class AppComponent {
 
   }
 
-  buildUrl(tipoPropiedad: string, valor: string): string {
-    return 'https://www.portalinmobiliario.com/venta/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
+  buildUrl(operacion: string, tipoPropiedad: string, valor: string): string {
+    return 'https://www.portalinmobiliario.com/'+operacion+'/' + tipoPropiedad + '/' + valor + '?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=1&sp=0';
   }
 
   formatFecha(fecha: Date): string{       
